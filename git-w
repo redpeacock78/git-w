@@ -11,7 +11,6 @@
 # @(#)Arguments:
 # @(#)  -u, --user [USER_NAME]
 # @(#)  -g, --grass [ANY_CHARACTER]
-# @(#)  -l, --local
 # @(#)  -h, --help
 # @(#)Returns:
 # @(#)  None
@@ -46,8 +45,6 @@ Option:
                                  (Default: git config --global user.name)
   -g, --grass [ANY_CHARACTER]    Displays contributions with the specified characters
                                  (Default: "W")
-  -l, --local                    Displays user contributions in the local repository
-                                 (Cannot be used with the "--user" option)
   -h, --help                     Show usage
   -v, --version                  Show version and info
 
@@ -146,18 +143,10 @@ function option_perse(){
         if [[ -z "${NAME}" ]]; then
           error
         fi
-      elif [[ "${2}" == -l ]] || \
-           [[ "${2}" == --local ]]; then
-        declare NAME="$(git config --local user.name 2>/dev/null)"
-        if [[ -z "${NAME}" ]]; then
-          error
-        fi
       elif [[ -z "${2}" ]]; then
         :
       elif [[ ! "${2}" == -u ]] || \
-           [[ ! "${2}" == --user ]] || \
-           [[ ! "${2}" == -l ]] || \
-           [[ ! "${2}" == --local ]]; then
+           [[ ! "${2}" == --user ]]; then
         error
       fi
     else
