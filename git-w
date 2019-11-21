@@ -46,7 +46,6 @@ Option:
   -g, --grass [ANY_CHARACTER]    Displays contributions with the specified characters
                                  (Default: "W")
   -h, --help                     Show usage
-  -v, --version                  Show version and info
 
 TL;DR
   $ git w
