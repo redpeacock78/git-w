@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+#
+# @(#)git-w 0.0.1
+# @(#)(c) 2019 redpeacock78
+# @(#)GPLv3+ is applied to this script.
+# @(#)
+########################################
+# @(#)It is a subcommand of the git command and displays github.com contribution.
+# @(#)Grobals:
+# @(#)  GRASS_DATA
+# @(#)Arguments:
+# @(#)  -u, --user [USER_NAME]
+# @(#)  -g, --grass [ANY_CHARACTER]
+# @(#)  -l, --local
+# @(#)  -h, --help
+# @(#)Returns:
+# @(#)  None
+# @(#)Depends:
+# @(#)  MKTEMP
+# @(#)  XARGS
+# @(#)  BASH
+# @(#)  CURL
+# @(#)  GREP
+# @(#)  SORT
+# @(#)  UNIQ
+# @(#)  ECHO
+# @(#)  TRAP
+# @(#)  GIT
+# @(#)  SED
+# @(#)  CAT
+# @(#)  AWK
+# @(#)  TR
+########################################
+
+
+####MESSAGES####
+###SHOW_USAGE###
+function usage(){
+  {
+   cat << EOS >&2
+Usage: git w [OPTION] [ANYTHING]
+It is a subcommand of the git command and displays github.com contribution.
+
+Option:
+  -u, --user [USER_NAME]         Displays the contribution of the specified user
+                                 (Default: git config --global user.name)
+  -g, --grass [ANY_CHARACTER]    Displays contributions with the specified characters
+                                 (Default: "W")
+  -l, --local                    Displays user contributions in the local repository
+                                 (Cannot be used with the "--user" option)
+  -h, --help                     Show usage
+  -v, --version                  Show version and info
+
+TL;DR
+  $ git w
+  $ git -g '#'
+  $ git --user hoge --grass 'w'
+EOS
+   exit 0
+  }
+}
+###ERROR_MESSAGE###
+function error(){
+  {
+   cat << ERR 1>&2
+git w: Sorry. An error has occurred :_(
+Refer 'git w -h' or 'git w --help' for how to use the command.
+ERR
+   exit 1
+  }
+}
+
+
+####MAIN_PROCESSING####
+function get_grass_data(){
+ declare -g GRASS_DATA="$(mktemp)"
+ curl -s https://github.com/users/${NAME:-$(git config --global user.name)}/contributions >> "${GRASS_DATA}"
+}
+function on_exit(){
+  rm -rf "${GRASS_DATA}" && exit 0
+}
+function on_pre_exit(){
+  rm -rf "${GRASS_DATA}" && \
+  error && \
+  exit 2
+}
+function extracting_y_axis(){
+  cat "${GRASS_DATA}" \
+  | grep '<rect class="day"' \
+  | sed 's/^ *//g' \
+  | awk '{print $6}' \
+  | sort \
+  | uniq \
+  | tr -d 'y=' \
+  | tr -d '"'
+}
+function glass_generate(){
+  cat "${GRASS_DATA}" \
+  | grep "y=\"${@}\"" \
+  | sed 's/^ *//g' \
+  | awk '{print $7}' \
+  | sed 's/#196127/058/g;s/#239a3b/034/g;s/#7bc96f/035/g;s/#c6e48b/048/g;s/#ebedf0/250/g;s/fill=//g;s/"//g' \
+  | xargs -n1 -I @ bash -c 'echo -e "\e[38;5;@m${GRASS:-W}\e[m"'
+}
+function main(){
+  {
+   export -f glass_generate
+   export GRASS="${GRASS}"
+   export GRASS_DATA="${GRASS_DATA}"
+   extracting_y_axis \
+   | xargs -n1 -I @ bash -c 'builtin echo $(glass_generate @)' \
+   | tr -d ' '
+  }
+}
+
+function option_perse(){
+  if [[ "${@}" == -h ]] || \
+     [[ "${@}" == --help ]]; then
+    usage
+  elif [[ "${@}" =~ - ]]; then
+    if [[ "${1}" == -u ]] || \
+       [[ "${1}" == --user ]]; then
+      shift && declare NAME="${1##-*}"
+      if [[ -z "${NAME}" ]]; then
+        error
+      elif [[ "${2}" == -g ]] || \
+           [[ "${2}" == --glass ]]; then
+        shift && declare GRASS="${2}"
+        if [[ -z "${GRASS}" ]]; then
+          error
+        fi
+      elif [[ -z "${2}" ]]; then
+        :
+      elif [[ ! "${2}" == -g ]] || \
+           [[ ! "${2}" == --glass ]]; then
+        error
+      fi
+    elif [[ "${1}" == -g ]] || \
+         [[ "${1}" == --glass ]]; then
+      shift && declare GRASS="${1##-*}"
+      if [[ -z "${GRASS}" ]]; then
+        error
+      elif [[ "${2}" == -u ]] || \
+           [[ "${2}" == --user ]]; then
+        shift && declare NAME="${2}"
+        if [[ -z "${NAME}" ]]; then
+          error
+        fi
+      elif [[ "${2}" == -l ]] || \
+           [[ "${2}" == --local ]]; then
+        declare NAME="$(git config --local user.name 2>/dev/null)"
+        if [[ -z "${NAME}" ]]; then
+          error
+        fi
+      elif [[ -z "${2}" ]]; then
+        :
+      elif [[ ! "${2}" == -u ]] || \
+           [[ ! "${2}" == --user ]] || \
+           [[ ! "${2}" == -l ]] || \
+           [[ ! "${2}" == --local ]]; then
+        error
+      fi
+    else
+      error
+    fi
+  elif [[ -z "${1}" ]]; then
+    :
+  else
+    error
+  fi
+  {
+   get_grass_data "${NAME}" && \
+   echo -e "$(main ${GRASS})"
+  }
+}
+
+trap on_pre_exit HUP INT QUIT TERM
+option_perse "${@}"
+trap on_exit EXIT
