@@ -123,7 +123,7 @@ function option_perse(){
       if [[ -z "${NAME}" ]]; then
         error
       elif [[ "${2}" == -g ]] || \
-           [[ "${2}" == --glass ]]; then
+           [[ "${2}" == --grass ]]; then
         shift && declare GRASS="${2}"
         if [[ -z "${GRASS}" ]]; then
           error
@@ -135,7 +135,7 @@ function option_perse(){
         error
       fi
     elif [[ "${1}" == -g ]] || \
-         [[ "${1}" == --glass ]]; then
+         [[ "${1}" == --grass ]]; then
       shift && declare GRASS="${1##-*}"
       if [[ -z "${GRASS}" ]]; then
         error
