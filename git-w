@@ -131,7 +131,7 @@ function option_perse(){
       elif [[ -z "${2}" ]]; then
         :
       elif [[ ! "${2}" == -g ]] || \
-           [[ ! "${2}" == --glass ]]; then
+           [[ ! "${2}" == --grass ]]; then
         error
       fi
     elif [[ "${1}" == -g ]] || \
