@@ -16,6 +16,7 @@
 # @(#)  None
 # @(#)Depends:
 # @(#)  MKTEMP
+# @(#)  PRINTF
 # @(#)  XARGS
 # @(#)  BASH
 # @(#)  CURL
@@ -70,7 +71,7 @@ ERR
 ####MAIN_PROCESSING####
 function get_grass_data(){
  declare -g GRASS_DATA="$(mktemp)"
- curl -s https://github.com/users/${NAME:-$(git config --global user.name)}/contributions >> "${GRASS_DATA}"
+ curl -s https://github.com/users/${@}/contributions >> "${GRASS_DATA}"
 }
 function on_exit(){
   rm -rf "${GRASS_DATA}" && exit 0
@@ -103,6 +104,8 @@ function main(){
    export -f glass_generate
    export GRASS="${GRASS}"
    export GRASS_DATA="${GRASS_DATA}"
+   echo "${USER_NAME}'s Contributions:" && \
+   echo "$(printf ="%.s" {1..53})" && \
    extracting_y_axis \
    | xargs -n1 -I @ bash -c 'builtin echo $(glass_generate @)' \
    | tr -d ' '
@@ -157,7 +160,8 @@ function option_perse(){
     error
   fi
   {
-   get_grass_data "${NAME}" && \
+   declare USER_NAME="${NAME:-$(git config --global user.name)}"
+   get_grass_data "${USER_NAME}" && \
    echo -e "$(main ${GRASS})"
   }
 }
