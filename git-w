@@ -33,6 +33,7 @@
 ########################################
 
 
+
 ####MESSAGES####
 ###SHOW_USAGE###
 function usage(){
@@ -97,7 +98,7 @@ function glass_generate(){
   | sed 's/^ *//g' \
   | awk '{print $7}' \
   | sed 's/#196127/058/g;s/#239a3b/034/g;s/#7bc96f/035/g;s/#c6e48b/048/g;s/#ebedf0/250/g;s/fill=//g;s/"//g' \
-  | xargs -n1 -I @ bash -c 'echo -e "\e[38;5;@m${GRASS:-W}\e[m"'
+  | xargs -n1 -I @ bash -c 'echo -e "${WEEKDAY}\e[38;5;@m${GRASS:-W}\e[m"'
 }
 function main(){
   {
@@ -105,10 +106,11 @@ function main(){
    export GRASS="${GRASS}"
    export GRASS_DATA="${GRASS_DATA}"
    echo "${USER_NAME}'s Contributions:" && \
-   echo "$(printf ="%.s" {1..53})" && \
+   echo "$(printf ="%.s" {1..57})" && \
    extracting_y_axis \
    | xargs -n1 -I @ bash -c 'builtin echo $(glass_generate @)' \
-   | tr -d ' '
+   | tr -d ' ' \
+   | sed '1s/^/    /;2s/^/Mon /;3s/^/    /;4s/^/Wed /;5s/^/    /;6s/^/Fri /;7s/^/    /'
   }
 }
 
@@ -166,6 +168,8 @@ function option_perse(){
   }
 }
 
-trap on_pre_exit HUP INT QUIT TERM
-option_perse "${@}"
-trap on_exit EXIT
+{
+ trap on_pre_exit HUP INT QUIT TERM
+ option_perse "${@}"
+ trap on_exit EXIT
+}
