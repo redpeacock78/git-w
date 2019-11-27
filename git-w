@@ -98,15 +98,15 @@ function glass_generate(){
   | sed 's/^ *//g' \
   | awk '{print $7}' \
   | sed 's/#196127/058/g;s/#239a3b/034/g;s/#7bc96f/035/g;s/#c6e48b/048/g;s/#ebedf0/250/g;s/fill=//g;s/"//g' \
-  | xargs -n1 -I @ bash -c 'echo -e "${WEEKDAY}\e[38;5;@m${GRASS:-W}\e[m"'
+  | xargs -n1 -I @ bash -c 'builtin echo -e "${WEEKDAY}\e[38;5;@m${GRASS:-W}\e[m"'
 }
 function main(){
   {
    export -f glass_generate
    export GRASS="${GRASS}"
    export GRASS_DATA="${GRASS_DATA}"
-   echo "${USER_NAME}'s Contributions:" && \
-   echo "$(printf ="%.s" {1..57})" && \
+   builtin echo "${USER_NAME}'s Contributions:" && \
+   builtin echo "$(printf ="%.s" {1..57})" && \
    extracting_y_axis \
    | xargs -n1 -I @ bash -c 'builtin echo $(glass_generate @)' \
    | tr -d ' ' \
@@ -164,7 +164,7 @@ function option_perse(){
   {
    declare USER_NAME="${NAME:-$(git config --global user.name)}"
    get_grass_data "${USER_NAME}" && \
-   echo -e "$(main ${GRASS})"
+   builtin echo -e "$(main ${GRASS})"
   }
 }
 
