@@ -80,7 +80,7 @@ function on_pre_exit(){
 }
 function get_grass_data(){
  declare -g GRASS_DATA="$(mktemp)"
- curl -s -o "${GRASS_DATA}" https://github.com/users/${@}/contributions || \
+ curl -s -o "${GRASS_DATA}" "https://github.com/users/${@}/contributions" || \
  {
   builtin echo "${0##*/}: Connect to a network line." && \
   on_pre_exit
