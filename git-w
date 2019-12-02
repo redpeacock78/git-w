@@ -39,7 +39,7 @@
 function usage(){
   {
    cat << EOS >&2
-Usage: git w [OPTION] [ANYTHING]
+Usage: ${0##*/} [OPTION] [ANYTHING]
 It is a subcommand of the git command and displays github.com contribution.
 
 Option:
@@ -61,7 +61,7 @@ EOS
 function error(){
   {
    cat << ERR 1>&2
-git w: Sorry. An error has occurred :_(
+${0##*/}: Sorry. An error has occurred :_(
 Refer 'git w -h' or 'git w --help' for how to use the command.
 ERR
    exit 1
@@ -76,12 +76,15 @@ function on_exit(){
 function on_pre_exit(){
   rm -rf "${GRASS_DATA}" && \
   error && \
-  exit 2
+  exit 1
 }
 function get_grass_data(){
  declare -g GRASS_DATA="$(mktemp)"
  curl -s -o "${GRASS_DATA}" https://github.com/users/${@}/contributions || \
- on_pre_exit
+ {
+  builtin echo "${0##*/}: Connect to a network line." && \
+  on_pre_exit
+ }
 }
 function extracting_y_axis(){
   cat "${GRASS_DATA}" \
