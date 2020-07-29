@@ -101,7 +101,7 @@ function glass_generate(){
   | grep "y=\"${@}\"" \
   | sed 's/^ *//g' \
   | awk '{print $7}' \
-  | sed 's/#196127/058/g;s/#239a3b/034/g;s/#7bc96f/035/g;s/#c6e48b/048/g;s/#ebedf0/250/g;s/fill=//g;s/"//g' \
+  | sed 's/#ebedf0/250/g;s/#9be9a8/048/g;s/#40c463/034/g;s/#30a14e/035/g;s/#216e39/058/g;s/fill=//g;s/"//g' \
   | xargs -n1 -I @ bash -c 'builtin echo -e "\e[38;5;@m${GRASS:-W}\e[m"'
 }
 function main(){
