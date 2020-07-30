@@ -50,9 +50,9 @@ Option:
   -h, --help                     Show usage
 
 TL;DR
-  $ git w
-  $ git -g '#'
-  $ git --user hoge --grass 'w'
+  $ ${0##*/}
+  $ ${0##*/} -g '#'
+  $ ${0##*/} --user hoge --grass 'w'
 EOS
    exit 0
   }
